@@ -6,10 +6,12 @@ using UnityEngine.Networking;
 [System.Obsolete("Using UNET")]
 public class PlayerManager : NetworkManager
 {
-    // Start is called before the first frame update
-    void Start()
+
+    public override void OnServerAddPlayer(NetworkConnection conn, short playerControllerId)
     {
-        
+        GameObject player = (GameObject)Instantiate(playerPrefab, Vector3.zero, Quaternion.identity);
+     //   player.GetComponent<Player>().color = Color.red;
+        NetworkServer.AddPlayerForConnection(conn, player, playerControllerId);
     }
 
     // Update is called once per frame

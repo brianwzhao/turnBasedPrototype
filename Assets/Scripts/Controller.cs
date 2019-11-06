@@ -79,6 +79,7 @@ public class Controller : NetworkBehaviour
     [ServerCallback]
     private void OnDestroy()
     {
+        TurnManager.Instance.unregisterPlayer(connectionToClient);
         Destroy(character);
     }
 

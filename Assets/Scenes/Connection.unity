@@ -244,7 +244,7 @@ MonoBehaviour:
   m_OnlineScene: Level0
   m_SpawnPrefabs:
   - {fileID: 3323405070502974754, guid: 136820983154abd40a75eebfafcd5849, type: 3}
-  - {fileID: 6684321163184821408, guid: bf81b62a289e7d14bab10a44faf006e1, type: 3}
+  - {fileID: 6151020375949591107, guid: bf81b62a289e7d14bab10a44faf006e1, type: 3}
   - {fileID: 1575865570880231149, guid: 2f8bd1b8fb2cb8144b185ddadf191f91, type: 3}
   - {fileID: 319131556063014483, guid: 56dc14556a4d6ba44971d7849ad743ec, type: 3}
   - {fileID: 0}
