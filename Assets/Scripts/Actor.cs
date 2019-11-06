@@ -1,8 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
-public class Actor : MonoBehaviour
+//Disable deprecation warnings since UNET is deprecated
+[System.Obsolete("Using UNET")]
+public class Actor : NetworkBehaviour
 {
     moveInfo MoveStart;
     moveInfo MoveEnd;
@@ -11,12 +14,14 @@ public class Actor : MonoBehaviour
 
     int bulletCount;
 
+    [SyncVar]
     public float Health;
 
     [SerializeField]
     private GameObject Projectile;
 
     // Start is called before the first frame update
+    [ServerCallback]
     void Start()
     {
         MoveEnd.Position = transform.position;
@@ -24,7 +29,7 @@ public class Actor : MonoBehaviour
         MoveEnd.View += transform.forward.normalized * 2f;
     }
 
-
+    [ServerCallback]
     void FixedUpdate()
     {
         if (TurnManager.Instance.status != TurnStatus.Executing) return;
@@ -53,7 +58,8 @@ public class Actor : MonoBehaviour
         bulletCount++;
     }
 
-    public void doMove(moveInfo move)
+    [Server]
+    public void CmdDoMove(moveInfo move)
     {
         MoveStart.Time = 0;
         MoveStart.Position = transform.position;
@@ -65,6 +71,7 @@ public class Actor : MonoBehaviour
         delta.Time = (0.1f + delta.Position.magnitude) * (10 + delta.View.magnitude);
     }
 
+    [Server]
     private void ShootForward()
     {
         GameObject go = Instantiate(Projectile);
@@ -77,10 +84,13 @@ public class Actor : MonoBehaviour
         proj.velocity += transform.right * Random.Range(-1f, 1f) * delta.Time;
 
         proj.lifetime = 4;
-    }
 
+        NetworkServer.Spawn(go);
+    }
+    
     private void OnTriggerEnter(Collider collision)
     {
+        Debug.Log("Player COllision");
         Projectile proj = collision.gameObject.GetComponentInParent<Projectile>();
         if(proj == null)
         {

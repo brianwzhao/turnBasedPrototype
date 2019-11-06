@@ -4,18 +4,17 @@ using UnityEngine;
 
 public class Handle : MonoBehaviour
 {
-    [SerializeField]
-    new protected UnityEngine.Camera camera;
+    new protected Camera camera;
 
     [SerializeField]
     private float maxDistance;
 
     private Vector3 initialHandlePosition;
     private Vector3 initialMousePosition;
-    // Start is called before the first frame update
-    void Start()
+
+    private void Start()
     {
-        
+        camera = Camera.main;
     }
 
     // Update is called once per frame
@@ -24,22 +23,25 @@ public class Handle : MonoBehaviour
 
         clampPosition();
     }
-
+    
     private void OnMouseDown()
     {
         initialMousePosition = getMousePosition();
         initialHandlePosition = transform.position;
     }
-
+    
     private void OnMouseDrag()
     {
-        Vector3 tempMousePosition = getMousePosition();
-        Vector3 delta = initialMousePosition - tempMousePosition;
-        delta.y = 0;
-        
-        gameObject.transform.position = initialHandlePosition - delta;
-    }
+        if (true)
+        {
+            Vector3 tempMousePosition = getMousePosition();
+            Vector3 delta = initialMousePosition - tempMousePosition;
+            delta.y = 0;
 
+            gameObject.transform.position = initialHandlePosition - delta;
+        }
+    }
+    
     private Vector3 getMousePosition()
     {
         Vector3 screen = Input.mousePosition;

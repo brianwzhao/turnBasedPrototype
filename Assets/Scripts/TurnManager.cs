@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Networking;
 
 public enum TurnStatus
 {
@@ -11,12 +12,21 @@ public enum TurnStatus
     Waiting
 }
 
-public class TurnManager : MonoBehaviour
+[System.Obsolete("Using UNET")]
+public class TurnManager : NetworkBehaviour
 {
     [SerializeField]
     Button button;
 
-    public TurnStatus status { get; private set; }
+    Dictionary<NetworkConnection, bool> readyMap;
+
+    [SyncVar]
+    TurnStatus _status;
+    public TurnStatus status
+    {
+        get { return _status; }
+        private set { _status = value; }
+    }
 
     public float TimeInterval
     {
@@ -31,18 +41,23 @@ public class TurnManager : MonoBehaviour
     [SerializeField]
     private float timeLeft;
 
-    static public TurnManager Instance{
+
+    static public TurnManager Instance
+    {
         get; private set;
-        }
+    }
+
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         if (!Instance)
         {
             Instance = this;
         }
-        button.onClick.AddListener(onButtonClick);
+        //button.onClick.AddListener(onButtonClick);
         status = TurnStatus.Waiting;
+
+        readyMap = new Dictionary<NetworkConnection, bool>();
     }
 
     // Update is called once per frame
@@ -64,16 +79,46 @@ public class TurnManager : MonoBehaviour
             
     }
 
+    public void registerPlayer(NetworkConnection id)
+    {
+        readyMap.Add(id, false);
+    }
+
+    public void unregisterPlayer(NetworkConnection id)
+    {
+        readyMap.Remove(id);
+    }
+
+    public void setReady(NetworkConnection id)
+    {
+        readyMap[id] = true;
+        NetworkConnection[] keys = new NetworkConnection[readyMap.Keys.Count];
+        readyMap.Keys.CopyTo(keys, 0);
+        Debug.Log(keys.Length);
+        foreach (var elem in keys)
+        {
+            if (readyMap[elem] == false) return;
+        }
+        foreach(var elem in keys)
+        {
+            readyMap[elem] = false;
+        }
+        StartCoroutine(OnButtonClick().GetEnumerator());
+    }
+
     internal IEnumerable OnButtonClick()
     {
-        Debug.Log("hmm");
-        status = TurnStatus.StartExecution;
-        timeLeft = TimeInterval;
+        if (isServer)
+        {
+            Debug.Log("hmm");
+            status = TurnStatus.StartExecution;
+            timeLeft = TimeInterval;
 
-        yield return new WaitForFixedUpdate();
-        status = TurnStatus.Executing;
+            yield return new WaitForFixedUpdate();
+            status = TurnStatus.Executing;
 
-        yield return new WaitForFixedUpdate();
+            yield return new WaitForFixedUpdate();
+        }
     }
 
     private void onButtonClick()

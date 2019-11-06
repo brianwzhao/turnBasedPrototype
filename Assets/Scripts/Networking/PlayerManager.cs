@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 
 [System.Obsolete("Using UNET")]
-public class Wall : NetworkBehaviour
+public class PlayerManager : NetworkManager
 {
     // Start is called before the first frame update
     void Start()
@@ -16,16 +16,5 @@ public class Wall : NetworkBehaviour
     void Update()
     {
         
-    }
-    
-    [ServerCallback]
-    private void OnTriggerEnter(Collider collision)
-    {
-        Projectile proj = collision.gameObject.GetComponentInParent<Projectile>();
-        if (proj == null)
-        {
-            return;
-        }
-        Destroy(proj.gameObject);
     }
 }

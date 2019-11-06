@@ -1,8 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
-public class Projectile : MonoBehaviour
+[System.Obsolete("Using UNET")]
+public class Projectile : NetworkBehaviour
 {
     public Vector3 velocity;
     public float lifetime;
@@ -13,6 +15,7 @@ public class Projectile : MonoBehaviour
     }
 
     // Update is called once per frame
+    [ServerCallback]
     void FixedUpdate()
     {
         if (TurnManager.Instance.status != TurnStatus.Executing) return;
