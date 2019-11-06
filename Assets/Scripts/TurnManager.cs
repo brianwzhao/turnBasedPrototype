@@ -20,12 +20,15 @@ public class TurnManager : NetworkBehaviour
 
     Dictionary<NetworkConnection, bool> readyMap;
 
-    [SyncVar]
+
     TurnStatus _status;
     public TurnStatus status
     {
         get { return _status; }
-        private set { _status = value; }
+        private set
+        {
+            StartCoroutine(setStatus(value));
+        }
     }
 
     public float TimeInterval
@@ -68,15 +71,29 @@ public class TurnManager : NetworkBehaviour
 
     private void FixedUpdate()
     {
-        if (status == TurnStatus.Executing)
+        if (_status == TurnStatus.FinishExecution)
         {
-            timeLeft -= Time.fixedDeltaTime;
+            status = TurnStatus.Waiting;
         }
-        if (timeLeft < 0)
+        if (isServer)
         {
-            status += 1;
+            if (status == TurnStatus.Executing)
+            {
+                timeLeft -= Time.fixedDeltaTime;
+                if (timeLeft < 0)
+                {
+                    RpcUpdateClientStatus(TurnStatus.FinishExecution);
+                    status = TurnStatus.FinishExecution;
+                }
+            }
         }
             
+    }
+
+    [ClientRpc]
+    public void RpcUpdateClientStatus(TurnStatus status)
+    {
+        this.status = status;
     }
 
     public void registerPlayer(NetworkConnection id)
@@ -119,6 +136,13 @@ public class TurnManager : NetworkBehaviour
 
             yield return new WaitForFixedUpdate();
         }
+    }
+
+    private IEnumerator setStatus(TurnStatus value)
+    {
+        yield return new WaitForFixedUpdate();
+        _status = value;
+        yield return new WaitForFixedUpdate();
     }
 
     private void onButtonClick()
