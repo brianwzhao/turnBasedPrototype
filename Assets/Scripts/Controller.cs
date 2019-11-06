@@ -74,24 +74,18 @@ public class Controller : MonoBehaviour
         float y = destinationPos.y;
         destinationPos.y = 0;
         float distanceSquare = destinationPos.magnitude + 1;
-        Debug.Log("From: " + distanceSquare);
         ray.direction = destinationPos;
         ray.origin = transform.position;
-
-        Debug.Log(ray.origin);
+        
         LayerMask mask = 1 << 10;
-        Debug.Log("mask: " + mask);
+
         RaycastHit hitInfo;
         bool hit = Physics.Raycast(ray, out hitInfo, distanceSquare, mask);
         if (hit)
-        {
-            Debug.Log("Hit layer: " + hitInfo.transform.gameObject.layer + 
-                "  Hit Name: " + hitInfo.transform.gameObject.name);
-            
+        {   
             float distance = hitInfo.distance;
             if(distance < distanceSquare)
             {
-                Debug.Log("Clamp:" + distance + "  From: " + distanceSquare);
                 //clamp the locatioin
                 destinationPos = ray.GetPoint(distance - 1);
                 destinationPos.y = y;

@@ -51,13 +51,6 @@ public class Actor : MonoBehaviour
             ShootForward();
         }
         bulletCount++;
-
-
-        GameObject go = Instantiate(Projectile);
-        Projectile proj = go.GetComponent<Projectile>();
-        go.transform.position = view;
-
-        proj.lifetime = 4;
     }
 
     public void doMove(moveInfo move)
@@ -88,7 +81,6 @@ public class Actor : MonoBehaviour
 
     private void OnTriggerEnter(Collider collision)
     {
-        Debug.Log("collision");
         Projectile proj = collision.gameObject.GetComponentInParent<Projectile>();
         if(proj == null)
         {
